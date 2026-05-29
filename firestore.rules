@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allow read access to ideas for all users, and write access for authenticated users
+    match /ideas/{ideaId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+
+    // Allow read access to users for all authenticated users
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Allow write access to fundingRequests for authenticated users
+    match /fundingRequests/{requestId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Allow write access to contactSubmissions for all users
+    match /contactSubmissions/{submissionId} {
+      allow read: if request.auth != null;
+      allow write: if true;
+    }
+  }
+}
